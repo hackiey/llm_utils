@@ -1,0 +1,141 @@
+{
+    "default_model": "gpt-3.5-turbo",
+    "llm_config": {
+        "model": "gpt-3.5-turbo",
+        "temperature": 0.7,
+        "top_p": 0.9,
+        "presence_penalty": 0,
+        "frequency_penalty": 0
+    },
+    "available_models": ["gpt-3.5-turbo", "qwen-turbo"],
+    "assistant_available_models": ["gpt-3.5-turbo", "qwen-turbo"],
+    "column_items": {
+        "status": {
+            "type": "select",
+            "field": "status",
+            "name": "状态",
+            "items": ["待处理", "已发送", "已删除"]
+        },
+        "tasks": {
+            "type": "select",
+            "field": "tasks",
+            "name": "任务",
+            "items": []
+        },
+        "tags": {
+            "type": "select",
+            "field": "tags",
+            "name": "标签",
+            "items": []
+        },
+        "chatlog_source": {
+            "type": "select",
+            "field": "chatlog_source",
+            "name": "来源",
+            "items": ["playground"]
+        },
+        "source": {
+            "type": "select",
+            "field": "source",
+            "name": "来源",
+            "items": ["chat_logs"]
+        },
+        "tools_category": {
+            "type": "select",
+            "field": "category",
+            "name": "类别",
+            "items": ["网络", "其他"]
+        },
+        "language": {
+            "type": "select",
+            "field": "language",
+            "name": "语言",
+            "items": ["zh", "en", "others"]
+        },
+        "difficulty": {
+            "type": "select",
+            "field": "difficulty",
+            "name": "难度",
+            "items": ["未分类", "简单", "中等", "困难"]
+        },
+        "verified": {
+            "type": "select",
+            "field": "verified",
+            "name": "验证",
+            "items": ["未验证", "已验证"]
+        },
+        "deleted": {
+            "type": "select",
+            "field": "deleted",
+            "name": "删除",
+            "items": ["未删除", "已删除"]
+        },
+        "marked": {
+            "type": "select",
+            "field": "marked",
+            "name": "标记",
+            "items": ["未标记", "已标记"]
+        },
+        "inspection": {
+            "type": "select",
+            "field": "inspection",
+            "name": "质检",
+            "items": ["未检查", "已检查"]
+        },
+        "marked_user": {
+            "type": "text",
+            "field": "marked_user",
+            "name": "标记用户"
+        },
+        "data_type": {
+            "type": "select",
+            "name": "数据类型",
+            "items": ["train", "test", "preference"]
+        },
+        "create_user": {
+            "type": "text",
+            "field": "create_user",
+            "name": "创建用户"
+        },
+        "create_time": {
+            "type": "date",
+            "field": "create_time",
+            "name": "创建时间"
+        },
+        "update_user": {
+            "type": "text",
+            "field": "update_user",
+            "name": "更新用户"
+        },
+        "update_time": {
+            "type": "date",
+            "field": "update_time",
+            "name": "更新时间"
+        },
+        "verified_user": {
+            "type": "text",
+            "field": "verified_user",
+            "name": "验证用户"
+        },
+        "verified_time": {
+            "type": "date",
+            "field": "verified_time",
+            "name": "验证时间"
+        },
+        "characters": {
+            "type": "number",
+            "field": "characters",
+            "name": "字符数"
+        },
+        "messages_count": {
+            "type": "number",
+            "field": "messages_count",
+            "name": "消息数"
+        },
+        "prompt": {
+            "type": "text",
+            "field": "prompt",
+            "name": "Prompt"
+        }
+    }
+}

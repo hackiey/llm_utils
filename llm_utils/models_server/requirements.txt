@@ -1,0 +1,17 @@
+gradio
+openai
+mdtex2html
+google-api-python-client
+duckduckgo_search
+uvicorn
+loguru
+transformers==4.33.2
+langdetect>=1.0.9
+odps
+torch>=2.1.0
+pymongo>=4.6.0
+accelerate>=0.24.1
+xformers>=0.0.22
+dashscope
+duckduckgo_search
+trafilatura

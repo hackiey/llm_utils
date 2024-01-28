@@ -1,0 +1,90 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
+/*@media (prefers-color-scheme: dark) {*/
+/*  :root {*/
+/*    --foreground-rgb: 255, 255, 255;*/
+/*    --background-start-rgb: 0, 0, 0;*/
+/*    --background-end-rgb: 0, 0, 0;*/
+/*  }*/
+/*}*/
+
+/* body{
+  background: #FFFFFF;
+} */
+
+ol, ul, menu{
+  margin: 0;
+  padding: 0;
+}
+
+/*body {*/
+/*  color: rgb(var(--foreground-rgb));*/
+/*  background: linear-gradient(*/
+/*      to bottom,*/
+/*      transparent,*/
+/*      rgb(var(--background-end-rgb))*/
+/*    )*/
+/*    rgb(var(--background-start-rgb));*/
+/*}*/
+
+.distribution {
+  border: 1px solid lightblue;
+  text-align: center;
+}
+
+.distribution th{
+  border: 1px solid lightblue;
+  min-width: 150px;
+  padding: 10px;
+  color: #454647;
+}
+.distribution td{
+  border: 1px solid lightblue;
+  min-width: 150px;
+  color: #454647;
+}
+
+.distribution-column {
+  border: 1px solid lightblue;
+  text-align: center;
+}
+
+.distribution-column th{
+  border: 1px solid lightblue;
+  /*min-width: 150px;*/
+  padding: 10px;
+  color: #454647;
+}
+.distribution-column td{
+  border: 1px solid lightblue;
+  /*min-width: 150px;*/
+  color: #454647;
+}
+
+.tool-box p{
+  overflow: hidden; /* 确保超出的内容会被隐藏 */
+  white-space: nowrap; /* 防止内容换行 */
+  text-overflow: ellipsis; /* 使用省略号来表示被裁剪的文本 */
+  width: 100%; /* 你可以根据自己的需要设置宽度 */
+  display: block; /* 或者使用 inline-block 根据需要 */
+}
+
+.chat-history p{
+  display: -webkit-box;
+  /*display: box;*/
+  -webkit-box-orient: vertical;
+  box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  /*width: 200px; !* 根据需要设置宽度 *!*/
+}

@@ -1,3 +1,8 @@
+.vscode/
+.idea/
+
+llm_utils/models_server/models/config.json
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -158,3 +163,41 @@ cython_debug/
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
+
+
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+
+# llm_data folder
+
+llm_data/src/app/config.json
+
+# dependencies
+llm_data/node_modules
+llm_data/.pnp
+llm_data/.pnp.js
+
+# testing
+llm_data/coverage
+
+# next.js
+llm_data/.next/
+llm_data/out/
+
+# production
+llm_data/build
+
+# debug
+llm_data/npm-debug.log*
+llm_data/yarn-debug.log*
+llm_data/yarn-error.log*
+
+# local env files
+llm_data/.env*.local
+
+# vercel
+llm_data/.vercel
+
+# typescript
+llm_data/*.tsbuildinfo
+llm_data/next-env.d.ts
