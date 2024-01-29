@@ -6,7 +6,7 @@ let filters: any[] = [
     {type: "tags", operator: FilterOperators.Equal, arrayValue: ["全部"], textValue: ""},
     {type: "difficulty", operator: FilterOperators.Equal, arrayValue: ["全部"], textValue: ""},
     {type: "verified", operator: FilterOperators.Equal, arrayValue: ["全部"], textValue: ""},
-    {type: "evalution_name", operator: FilterOperators.Equal, araryValue: ["全部"], textValue: ""},
+    {type: "evaluation_task_name", operator: FilterOperators.Equal, arrayValue: [], textValue: ""},
 ]
 
 let page: number = 1;

@@ -7,7 +7,7 @@ import Filters from "@/app/components/filters";
 import PersonIcon from "@mui/icons-material/Person";
 import AssistantIcon from "@mui/icons-material/Assistant";
 import * as React from "react";
-import { evaluationStore, fetchEvaluationSamples, fetchEvaluationSampleTotalCount, requestUpdateEvaluationSample } from "@/app/store/evaluation";
+import { evaluationStore, fetchEvaluationSamples, fetchEvaluationSampleTotalCount, requestUpdateEvaluationSample } from "@/app/store/evaluation/evaluation";
 import {useSession} from "next-auth/react";
 
 const icons: { [index: string]: any } = {
@@ -141,6 +141,7 @@ export default function Evaluation (){
         }
         const _evaluationSample = res[0];
 
+        console.log(_evaluationSample);
         setEvaluationSample(_evaluationSample);
 
         // 更新messages
@@ -291,7 +292,8 @@ export default function Evaluation (){
             <Divider/>
             <Box sx={{marginTop: "20px"}}>
                 <p style={{fontWeight: "bold", color: "#454556", marginBottom: "5px"}}>参考答案</p>
-                <Markdown content={messages.length > 0 ? messages[messages.length-1].content : ""} />
+                {/* <Markdown content={messages.length > 0 ? messages[messages.length-1].content : ""} /> */}
+                <Markdown content={evaluationSample.reference.content} />
             </Box>
             <Divider sx={{width: "50%", marginTop: "10px"}} />
             <Box sx={{height: "40px", marginTop: "20px"}}>

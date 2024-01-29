@@ -9,45 +9,38 @@ def get_evaluation_collection():
     client = MongoClient(MONGO_CLIENT)
     db = client['llm_data']
 
-    return db['evaluation_tasks'], db['evaluation_samples']
+    return db['evaluation_samples']
 
 
-def create_evaluation_sample(task_id, sample, tags, replies, shuffle=True):
-    messages = []
-    for message in sample['messages'][:-1]:
-        messages.append({
-            "role": message['role'],
-            "content": message['content']
-        })
-        if "name" in message:
-            messages[-1]['name'] = message['name']
-        if "function_call" in message:
-            messages[-1]['function_call'] = message['function_call']
+def create_evaluation_sample(task_name, messages, referece, replies, reply_tags, tasks,  tags, source, language,
+                             difficulty, meta, rank_tags=None, shuffle=True):
 
-    indexes = list(range(len(tags)))
+    indexes = list(range(len(reply_tags)))
 
     if shuffle:
         random.shuffle(indexes)
 
     index_replies = []
-    index_tags = []
+    index_reply_tags = []
+
     for index in indexes:
         index_replies.append(replies[index])
-        index_tags.append(tags[index])
+        index_reply_tags.append(reply_tags[index])
 
     return {
-        "task_id": task_id,
-        "sample_id": sample['_id'],
-        "session_id": sample['session_id'],
-        "messages": sample['messages'],
+        "task_name": task_name,
+        "messages": messages,
+        "reference": referece,
         "replies": replies,
-        "reply_tags": index_tags,
-        "rank_tags": [-1] * len(tags),
-        "tasks": sample['tasks'],
-        "tags": sample['tags'],
-        "source": sample['source'],
-        "language": sample['language'],
-        "difficulty": sample['difficulty'],
+        "reply_tags": reply_tags,
+        "rank_tags": [-1] * len(tags) if rank_tags is None else rank_tags,
+        "tasks": tasks,
+        "tags": tags,
+        "source": source,
+        "language": language,
+        "difficulty": difficulty,
+        "meta": meta,
+        "create_user": "",
         "create_time": int(time.time() * 1000),
         "verified": "未验证",
         "verified_user": "",
@@ -55,17 +48,6 @@ def create_evaluation_sample(task_id, sample, tags, replies, shuffle=True):
         "update_user": "",
         "update_time": int(time.time() * 1000),
     }
-
-
-def create_task(name, description, tags, evaluation_tasks_collection):
-    evaluation_tasks_collection.insert_one({
-        "name": name,
-        "description": description,
-        "models": tags,
-        "create_time": int(time.time() * 1000),
-        "type": "evaluation"
-    })
-
 
 def insert_evaluation_sample(sample, evaluation_samples_collection):
     evaluation_samples_collection.insert_one(sample)

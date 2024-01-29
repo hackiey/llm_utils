@@ -1,9 +1,9 @@
-import { Box, Divider, Grid } from '@mui/material';
+import { Box, Divider } from '@mui/material';
 import { BarChart } from '@mui/x-charts';
 
 import Filters from '@/app/components/filters';
 import {useEffect, useState} from "react";
-import {distribution, fetchDistributionSamples, fetchEvaluationTasks} from "@/app/store/distribution";
+import {distribution, fetchDistributionSamples, fetchEvaluationTasks} from "@/app/store/evaluation/distribution";
 import {Markdown} from "@/app/components/markdown";
 import {ColumnItems} from "@/app/constant";
 
@@ -29,13 +29,13 @@ function PieDistribution(props: {distribution: {[index:string]: number}, categor
     )
 }
 
-function EvaluationResult(props: {evaluationResult: any, task: any}){
-    if (props.task == undefined || props.evaluationResult.confusion_matrix == undefined){
+function EvaluationResult(props: {evaluationResult: any}){
+    if (props.evaluationResult.confusion_matrix == undefined){
         return null;
     }
     return (
         <Box style={{marginTop: "20px"}}>
-            <Markdown content={`# ${props.task?.name || "Task"}`} />
+            <Markdown content={`# ${props.evaluationResult?.taskName || "Task"}`} />
 
             <Box sx={{marginTop: "30px"}}></Box>
             <p><span style={{color: "#55bb55"}}>Win</span>/<span style={{color: "#bb5555"}}>Lose</span>/<span style={{color: "#5555bb"}}>Draw</span></p>
@@ -43,18 +43,18 @@ function EvaluationResult(props: {evaluationResult: any, task: any}){
                 <thead>
                     <tr>
                         <th></th>
-                        {props.task.models.map((model: string, index: number)=>(
+                        {props.evaluationResult.models.map((model: string, index: number)=>(
                             <th key={index}>{model}</th>
                         ))}
                     </tr>
                 </thead>
                 <tbody>
 
-                {props.task.models.map((model: string, index1: number)=>(
+                {props.evaluationResult.models.map((model: string, index1: number)=>(
                     <tr key={index1}>
                         <th>{model}</th>
 
-                        {props.task.models.map((model2: string, index2: number)=> {
+                        {props.evaluationResult.models.map((model2: string, index2: number)=> {
                             if (model == model2) {
                                 return (<td key={index2}></td>)
                             }
@@ -112,7 +112,7 @@ function EvaluationResult(props: {evaluationResult: any, task: any}){
                 </thead>
                 <tbody>
 
-                    {props.task.models.map((model: string, index: number)=>(
+                    {props.evaluationResult.models.map((model: string, index: number)=>(
                         <tr key={index}>
                             <th>{model}</th>
                             {ColumnItems.tasks.items.map((task: string, index: number)=>(
@@ -136,7 +136,7 @@ function EvaluationResult(props: {evaluationResult: any, task: any}){
                 </thead>
                 <tbody>
 
-                    {props.task.models.map((model: string, index: number)=>(
+                    {props.evaluationResult.models.map((model: string, index: number)=>(
                         <tr key={index}>
                             <th>{model}</th>
                             {ColumnItems.tags.items.map((tag: string, index: number)=>(
@@ -160,7 +160,7 @@ function EvaluationResult(props: {evaluationResult: any, task: any}){
                 </thead>
                 <tbody>
 
-                    {props.task.models.map((model: string, index: number)=>(
+                    {props.evaluationResult.models.map((model: string, index: number)=>(
                         <tr key={index}>
                             <th>{model}</th>
                             {ColumnItems.difficulty.items.map((difficulty: string, index: number)=>(
@@ -177,9 +177,6 @@ function EvaluationResult(props: {evaluationResult: any, task: any}){
 }
 
 export default function Distribution() {
-
-    const [tasks, setTasks] = useState<any[]>([]);
-    const [currentTask, setCurrentTask] = useState<any>(distribution.getCurrentTask());
     const [evaluationResult, setEvaluationResult] = useState<{[index: string]: any}>({});
 
     const [filters, setFilters] = useState(distribution.getDistributionFilters());
@@ -190,35 +187,21 @@ export default function Distribution() {
         distribution.updateDistributionFilters(newFilters);
     }
 
-    async function getTasks(){
-        const tasks: any = await fetchEvaluationTasks();
-        setTasks(tasks);
-
-        if (!currentTask && tasks.length > 0) {
-            setCurrentTask(tasks[0]);
-        }
-    }
-
     async function updateEvaluationResult(){
-        const modelResult = await fetchDistributionSamples(filters, currentTask);
+        const modelResult = await fetchDistributionSamples(filters);
         setEvaluationResult(modelResult);
     }
 
     useEffect(()=>{
-        getTasks();
-    }, []);
-
-    useEffect(() => {
-        if (currentTask){
-            updateEvaluationResult();
-        }
-    }, [filters, currentTask]);
+        // getTasks();
+        updateEvaluationResult();
+    }, [filters]);
 
     return (
         <Box>
             <Filters filters={filters} availableFilterTypes={availableFilterTypes} updateFilters={updateFilters} />
 
-            <EvaluationResult evaluationResult={evaluationResult} task={currentTask} />
+            <EvaluationResult evaluationResult={evaluationResult} />
         </Box>
     )
 }

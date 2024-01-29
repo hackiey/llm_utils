@@ -216,11 +216,11 @@ def gpt_response_generator(params, request):
 
         if 'content' in delta and delta['content'] is not None:
             content += delta['content']
-        if 'function_call' in delta and delta['function_call'] is not None:
-            if 'name' in delta['function_call'] and delta['function_call']['name'] is not None:
-                function_call = delta['function_call']
-            if 'arguments' in delta['function_call'] and delta['function_call']['arguments'] is not None:
-                function_call['arguments'] += delta['function_call']['arguments']
+        # if 'function_call' in delta and delta['function_call'] is not None:
+        #     if 'name' in delta['function_call'] and delta['function_call']['name'] is not None:
+        #         function_call = delta['function_call']
+        #     if 'arguments' in delta['function_call'] and delta['function_call']['arguments'] is not None:
+        #         function_call['arguments'] += delta['function_call']['arguments']
         if 'tool_calls' in delta and delta['tool_calls'] is not None:
             if delta['tool_calls'][0]['id'] is not None:
                 tool_calls.append(delta['tool_calls'][0])
@@ -295,14 +295,16 @@ def gpt_response(request: ChatCompletionRequest):
     if request.max_tokens is not None:
         params["max_tokens"] = request.max_tokens
 
-    tools = [tool.model_dump(exclude_none=True) for tool in request.tools] if request.tools is not None else None
-    functions = [function.model_dump(exclude_none=True) for function in request.functions] if request.functions is not None else None
+    # print(type(request.tools[0]))
+    # tools = [tool.model_dump(exclude_none=True) for tool in request.tools] if request.tools is not None else None
+    # functions = [function.model_dump(exclude_none=True) for function in request.functions] if request.functions is not None else None
+    tools = request.tools
 
     if tools is not None and len(tools) > 0:
         params.update({"tools": tools, "tool_choice": request.tool_choice})
 
-    if functions is not None and len(functions) > 0:
-        params.update({"functions": functions, "function_call": request.function_call})
+    # if functions is not None and len(functions) > 0:
+    #     params.update({"functions": functions, "function_call": request.function_call})
 
     if request.stream:
         response = gpt_response_generator(params, request)

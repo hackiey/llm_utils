@@ -34,17 +34,8 @@ export async function fetchEvaluationTasks(){
     return response.json();
 }
 
-export async function fetchDistributionSamples(filters: any, task: any){
-    let taskId = task._id;
-    let models = task.models;
-
+export async function fetchDistributionSamples(filters: any){
     filters = extractFilters(filters);
-    if ('$and' in filters){
-        filters['$and'].push({task_id: taskId});
-        filters['$and'].push({verified: "已验证"});
-    }else {
-        filters['$and'] = [{task_id: taskId}, {verified: "已验证"}];
-    }
 
     console.log("[Distribution Filters]", filters);
 
@@ -60,13 +51,15 @@ export async function fetchDistributionSamples(filters: any, task: any){
 
     const evaluationSamples = await response.json();
 
-    return calculateEvaluationResult(evaluationSamples, models);
+    return calculateEvaluationResult(evaluationSamples);
 }
 
-function calculateEvaluationResult(evaluationSamples: any[], models: string[]){
+function calculateEvaluationResult(evaluationSamples: any[]){
 
     let modelResult: {[index: string]: any} = {
         confusion_matrix: [],
+        taskName: "",
+        models: [],
         taskScore: {},
         tagScore: {},
         difficultyScore: {},
@@ -74,7 +67,13 @@ function calculateEvaluationResult(evaluationSamples: any[], models: string[]){
         tagNum: {},
         difficultyNum: {},
     };
-    models.map((model) => {
+
+    const firstSample = evaluationSamples[0];
+    let models = firstSample.reply_tags;
+
+    modelResult.models = models;
+
+    models.map((model: string) => {
         modelResult.confusion_matrix.push(
             Array.from({length: models.length}, (_, index) => [0, 0, 0])); // [win, lose, tie]
 

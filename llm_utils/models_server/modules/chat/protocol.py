@@ -3,6 +3,8 @@ import time
 from enum import Enum
 from pydantic import BaseModel, Field
 from typing import Literal, Optional, List, Dict, Any, Union
+from openai.types.chat import ChatCompletionToolParam
+
 from llm_utils.models_server.protocol import UsageInfo
 
 
@@ -44,30 +46,30 @@ class ModelList(BaseModel):
     data: List[ModelCard] = []
 
 
-class ChatFunctionProperties(BaseModel):
-    type: str
-    description: Optional[str] = None
-    enum: Optional[List[str]] = None
-    items: Optional[object] = None
-    minItems: Optional[int] = None
-    maxItems: Optional[int] = None
+# class ChatFunctionProperties(BaseModel):
+#     type: str
+#     description: Optional[str] = None
+#     enum: Optional[List[str]] = None
+#     items: Optional[object] = None
+#     minItems: Optional[int] = None
+#     maxItems: Optional[int] = None
 
 
-class ChatFunctionParameters(BaseModel):
-    type: str = "object"
-    properties: Dict[str, ChatFunctionProperties] = {}
-    required: List[str] = []
+# class ChatFunctionParameters(BaseModel):
+#     type: str = "object"
+#     properties: Dict[str, ChatFunctionProperties] = {}
+#     required: List[str] = []
 
 
-class ChatFunction(BaseModel):
-    name: str
-    description: Optional[str] = None
-    parameters: ChatFunctionParameters
+# class ChatFunction(BaseModel):
+#     name: str
+#     description: Optional[str] = None
+#     parameters: ChatFunctionParameters
 
 
-class ChatTool(BaseModel):
-    type: str
-    function: ChatFunction
+# class ChatTool(BaseModel):
+#     type: str
+#     function: ChatFunction
 
 
 class FunctionCallResponse(BaseModel):
@@ -99,8 +101,8 @@ class ChatMessage(BaseModel):
     name: Optional[str] = None
     tool_call_id: Optional[str] = None
     tool_calls: Optional[List[ChatCompletionMessageToolCall]] = None
-    functions: Optional[List[ChatFunction]] = None
-    function_call: Optional[FunctionCallResponse] = None
+    # functions: Optional[List[ChatFunction]] = None
+    # function_call: Optional[FunctionCallResponse] = None
 
 
 class ChatCompletionRequest(BaseModel):
@@ -115,9 +117,9 @@ class ChatCompletionRequest(BaseModel):
     presence_penalty: Optional[float] = 0.0
     frequency_penalty: Optional[float] = 0.0
     user: Optional[str] = None
-    functions: Optional[List[ChatFunction]] = None
-    function_call: Union[str, Dict[str, str]] = "auto"
-    tools: Optional[List[ChatTool]] = None
+    # functions: Optional[List[ChatFunction]] = None
+    # function_call: Union[str, Dict[str, str]] = "auto"
+    tools: List[ChatCompletionToolParam] | None = None
     tool_choice: Union[str, Dict[str, str]] = "auto"
 
     # Additional parameters supported by vLLM

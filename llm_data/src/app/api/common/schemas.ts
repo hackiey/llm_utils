@@ -144,3 +144,25 @@ export const ToolSchema = new Schema({
 
     meta: {any: {}}
 });
+
+export const EvaluationSampleSchema = new Schema({
+    task_name: String,
+    messages: [SampleMessageSchema],
+    replies: [SampleMessageSchema],
+    reference: SampleMessageSchema,
+    reply_tags: [String],
+    rank_tags: [Number],
+    tasks: [String],
+    tags: [String],
+    source: String,
+    language: String,
+    difficulty: String,
+    meta: {any: {}},
+        create_user: String,
+    create_time: Number,
+    verified: String,
+    verified_user: String,
+    verified_time: Number,
+    update_user: String,
+    update_time: Number
+});
