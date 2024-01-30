@@ -126,7 +126,6 @@ export default function Evaluation (){
     }
 
     async function refreshData(){
-        console.log(filters);
         const res = await fetchEvaluationSamples(page, filters);
 
         setSubmitDisabled(false);
@@ -142,6 +141,7 @@ export default function Evaluation (){
         const _evaluationSample = res[0];
 
         console.log(_evaluationSample);
+
         setEvaluationSample(_evaluationSample);
 
         // 更新messages
@@ -293,7 +293,7 @@ export default function Evaluation (){
             <Box sx={{marginTop: "20px"}}>
                 <p style={{fontWeight: "bold", color: "#454556", marginBottom: "5px"}}>参考答案</p>
                 {/* <Markdown content={messages.length > 0 ? messages[messages.length-1].content : ""} /> */}
-                <Markdown content={evaluationSample.reference.content} />
+                <Markdown content={evaluationSample.reference?.content} />
             </Box>
             <Divider sx={{width: "50%", marginTop: "10px"}} />
             <Box sx={{height: "40px", marginTop: "20px"}}>
