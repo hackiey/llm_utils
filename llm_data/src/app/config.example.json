@@ -80,7 +80,7 @@
             "type": "select",
             "field": "inspection",
             "name": "质检",
-            "items": ["未检查", "已检查"]
+            "items": ["待质检", "已通过", "待返修"]
         },
         "marked_user": {
             "type": "text",
