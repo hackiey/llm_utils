@@ -9,21 +9,28 @@ agents_router = APIRouter(prefix="/agents", tags=["agents"])
 agents_samples_collection, agents_samples_histories_collection = get_agents_samples_collection()
 
 
-@agents_router.post("/list")
-async def list_agents(request: Request):
+# @agents_router.post("/list")
+# async def list_agents(request: Request):
+#     params = await request.json()
+#
+#     agents = []
+#     for agent in agents_samples_collection.find(
+#             {"name": params['name']}, {"agent_id": 1, "info": 1, "config": 1}).sort("create_time", 1):
+#
+#         agents.append({
+#             "agent_id": agent["agent_id"],
+#             "info": agent["info"],
+#             "config": agent["config"],
+#         })
+#
+#     return {"status": 200, "agents": agents}
+
+
+@agents_router.post("/total_count")
+async def total_count(request: Request):
     params = await request.json()
-
-    agents = []
-    for agent in agents_samples_collection.find(
-            {"name": params['name']}, {"agent_id": 1, "info": 1, "config": 1}).sort("create_time", 1):
-
-        agents.append({
-            "agent_id": agent["agent_id"],
-            "info": agent["info"],
-            "config": agent["config"],
-        })
-
-    return {"status": 200, "agents": agents}
+    total_count = agents_samples_collection.count_documents({"name": params['name']})
+    return {"status": 200, "total_count": total_count}
 
 
 @agents_router.post("/run_action")
@@ -46,9 +53,18 @@ async def run_action(request: Request):
 @agents_router.post("/get_config")
 async def get_config(request: Request):
     params = await request.json()
-    sample = agents_samples_collection.find_one({"agent_id": params['agent_id']})
-
-    return {"status": 200, "config": sample['config'], "total_actions": len(sample['actions'])}
+    # sample = agents_samples_collection.find_one({"agent_id": params['agent_id']})
+    print(params)
+    samples = agents_samples_collection.find({"name": params['name']}).sort("create_time", 1).skip(params['index'])
+    sample = samples[0]
+    return {
+        "status": 200,
+        "agent_id": sample['agent_id'],
+        "name": sample['name'],
+        "info": sample['info'],
+        "config": sample['config'],
+        "total_actions": len(sample['actions'])
+    }
 
 
 @agents_router.post("/jump_to_action")

@@ -86,3 +86,8 @@ def open_url(url, title, line_length, chunk_max_lines):
     page['max_scrolls'] = len(chunk_contents) - 1
 
     return page
+
+
+if __name__ == "__main__":
+    results = duckduckgo("你好", 3)
+    print(results)

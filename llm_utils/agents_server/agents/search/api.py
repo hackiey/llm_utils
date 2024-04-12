@@ -20,7 +20,13 @@ def run_action(sample, action):
     if action['action'] == "search":
         query = action['query']
 
-        if query not in open_pages:
+        run_search = True
+        if query in open_pages and len(open_pages[query]['results']) > 0:
+            run_search = False
+
+        print("run_search", run_search)
+
+        if run_search:
             if sample['config']['search_engine'] == "duckduckgo":
                 results = duckduckgo(query)
 

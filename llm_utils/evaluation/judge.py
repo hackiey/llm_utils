@@ -22,7 +22,6 @@ dimension2def = {
 }
 
 
-
 @dataclasses.dataclass
 class JudgeSample:
     id: str
@@ -69,15 +68,16 @@ def prompt_contruct(sample, dimensions):
     return prompt
 
 
-def get_gpt_judgement(samples, dimensions, output_path):
+def get_gpt_judgement(samples, dimensions, output_path=None):
 
     saved_results = {}
-    if os.path.exists(output_path):
+    if output_path is not None and os.path.exists(output_path):
         with open(output_path, "r") as f:
             for line in f.readlines():
                 result = json.loads(line)
                 saved_results[result["id"]] = result
 
+    results = []
     for sample in tqdm(samples):
         if sample.id in saved_results:
             continue
@@ -132,18 +132,36 @@ def get_gpt_judgement(samples, dimensions, output_path):
             "score": score
         }
 
-        with open(output_path, "a") as f:
-            f.write(json.dumps(result, ensure_ascii=False) + "\n")
+        results.append(result)
+
+        if output_path is not None:
+            with open(output_path, "a") as f:
+                f.write(json.dumps(result, ensure_ascii=False) + "\n")
+
+    return results
 
 
 if __name__ == "__main__":
     sample = JudgeSample(
-        question="亚玛芬体育上市后的市值相比李宁和特步有何显著变化，并且这一变化在中国体育产业中意味着什么?",
-        reference="亚玛芬体育的市值达到80.79亿美元，超越了李宁和特步，成为中国第二大体育用品企业。这一变化不仅显示了亚玛芬体育在全球体育用品市场中的竞争力和市场份额的扩张，同时也体现了中国体育用品企业在国际并购、品牌塑造与市场运营方面的成熟与自信，对中国体育产业的国际化和全球竞争力产生了积极影响。",
-        answer="亚玛芬体育上市后的市值超越了李宁和特步，成为中国第二大体育用品企业。提现了亚玛芬体育在全球体育用品市场中的竞争力逐步提高。"
+        id="1",
+        question="《猎冰》中哪位演员的手机在一个被认为有年代感的场景中抢镜，成为穿帮的一例？",
+        reference="周云鹏在《猎冰》中的一个场景中蹬着二八大杠去送报，其衣服兜里的智能手机抢镜，成为穿帮的一例。",
+        # answer="在电影《猎冰》（原名《雪暴》）中，并没有公开报道指出有哪位演员的手机在场景中抢镜或出现穿帮的情况。通常情况下，电影制作方会尽量避免现代物品出现在年代感较强的场景中以保持历史的真实性。如果真的有此类穿帮镜头，一般会被视为后期制作或剪辑时的疏忽，而不是演员的问题。如果你能提供更具体的信息或者哪一集的截图，可能会更准确地判断是否存在这个问题。",
+        # answer="在电视剧《猎冰》中，张若昀的手机在一个被认为有年代感的场景中抢镜，成为了穿帮的一例。这部剧以20世纪90年代的东北为背景，许多道具和细节都力求还原那个时期的风貌。然而，在一个雪地里拍摄的场景中，张若昀掏出口袋里的手机接听电话，但观众们清楚地看到那是一款现代智能手机，与剧集所营造的年代背景格格不入，成为了明显的穿帮镜头。",
+        answer='''《猎冰》现在正在热播中，这是部以反腐败为主题的电视剧，有很多知名演员出演，包括侯勇、王俊凯、张博、马晓伟、杨新鸣、赵荀等。该剧通过讲述一场跨越26年的反腐斗争，展现新时代中国共产党人坚持自我革命、坚定不移把反腐败斗争进行到底的鲜明立场和坚定决心。
+
+不过，随着剧情的推进，有网友发现一个比较尴尬的穿帮镜头。是的，你没看错，竟然是一部以2004年为背景的剧，手机镜头里竟然出现了一款2023年才有的新款iPhone 14系列！
+
+镜头是在第17集中的70:09秒处，丁汉昌（张博饰）在路边的小店和老板娘一起看黄宗伟（侯勇饰）等人开车过来。他从兜里掏出口罩准备戴上的时候，无意间露出兜里的手机。这是一款有着直角边框、金属边框和HOME键的手机，很多观众第一眼看到这个镜头还以为是现在的iPhone 11或iPhone SE 2022，但仔细一看，这尺寸和按键布局又不太对劲。
+
+更离谱的是，摄像头旁边还有一个小孔，这居然就是镜头！目前的iPhone中，只有iPhone 14和iPhone 14 Pro系列的摄像头设计是这样的，左边是主摄，右边是微距或ToF传感器，其他型号的手机都是摄像头居中，没有画圈的。有网友因此判断这是一款iPhone 14或iPhone 14 Pro，但奇怪的是，无论是丁汉昌这个角色还是当时的年代，都没有配套的服装和剧情细节来印证这一判断。
+
+因为实际上，iPhone 14系列是在2023年9月21日发布的，而《猎冰》的剧情时间线原本就在2004年-2030年之间，如果这部手机真是丁汉昌在2004年就有的，那就等于说他每年都有新的手机，而且不是像现在大家一样等到旧手机彻底不能用才换新的，而是一年之内就更换了。这种超前的手机更新观念，在以前的剧情里可是从来都没有描述过的。
+
+不少观众因此感到很失望，觉得这是个明显的穿帮镜头，也有部分观众认为这是个bug，毕竟现在的手机更新换代确实挺快的，偶尔出现'''
     )
     print(sample)
-    dimensions = ["事实正确性", "满足用户需求", "清晰度", "逻辑性", "完备性"]
+    dimensions = ["事实正确性", "满足用户需求", "完备性", "清晰度"]
 
-    rating, score = get_gpt_judgement(sample, dimensions)
-    print(rating, score)
+    results = get_gpt_judgement([sample], dimensions)
+    print(results)

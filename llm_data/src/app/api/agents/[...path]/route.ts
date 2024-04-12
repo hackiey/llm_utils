@@ -15,6 +15,9 @@ async function handler(req: NextRequest, { params }: { params: { path: string[] 
     } else if (path == "list") {
         const data = await requestJsonPost(`${BASE_URL}/v1/agents/list`, reqParams);
         return NextResponse.json(data);
+    } else if (path == "total_count"){
+        const data = await requestJsonPost(`${BASE_URL}/v1/agents/total_count`, reqParams);
+        return NextResponse.json(data);
     } else if (path == "get_config"){
         const data = await requestJsonPost(`${BASE_URL}/v1/agents/get_config`, reqParams);
         return NextResponse.json(data);

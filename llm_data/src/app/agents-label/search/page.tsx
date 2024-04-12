@@ -17,8 +17,9 @@ export default function Home(){
 
     const [currentIndex, setCurrentIndex] = useState("1");
     // const [totalNum, setTotalNum] = useState(0);
-    const [agentInfo, setAgentInfo] = useState<any>({});
-    const [agents, setAgents] = useState([]);
+    const [agentInfo, setAgentInfo] = useState<any>({info: {question: ""}, config: {max_actions: 0, max_quote_content: 0}, totalActions: 0});
+    // const [agents, setAgents] = useState([]);
+    const [totalNum, setTotalNum] = useState(0);
 
     const [question, setQuestion] = useState("");
 
@@ -40,21 +41,59 @@ export default function Home(){
     const [openPages, setOpenPages] = useState<any[]>([]);
 
     useEffect(() => {
-        listAgents();
+        // listAgents();
+        getTotalNum()
     }, []);
 
+    // useEffect(() => {
+    //     jumpToSample(1);
+    // }, [agents]);
     useEffect(() => {
         jumpToSample(1);
-    }, [agents]);
+    }, [totalNum]);
 
-    async function listAgents(){
-        const res = await fetch("/api/agents/list", {
+    // async function listAgents(){
+    //     const res = await fetch("/api/agents/list", {
+    //         method: "POST",
+    //         body: JSON.stringify({name: "search_agent_v1"}),
+    //         headers: {"Content-Type": "application/json"}
+    //     });
+    //     const resData = await res.json();
+    //     setAgents(resData['agents']);
+    // }
+
+    useEffect(() => {
+        console.log(agentInfo);
+        setQuestion(agentInfo['info']['question']);
+        setPosition("search");
+        setSearchResults([]);
+        setQuotes([]);
+        setActionIndex(0);
+        setActionDescription("");
+
+        // const res = await fetch("/api/agents/get_config", {
+        //     method: "POST",
+        //     body: JSON.stringify({agent_id: agentInfo['agent_id']}),
+        //     headers: {"Content-Type": "application/json"}
+        // });
+        //
+        // const resData = await res.json();
+        // setTotalActions(resData['total_actions']);
+        // setActionsLeft(resData['config']['max_actions']);
+        // setQuotesLeft(resData['config']['max_quote_content']);
+        setTotalActions(parseInt(agentInfo['total_actions']));
+        setActionsLeft(agentInfo['config']['max_actions']);
+        setQuotesLeft(agentInfo['config']['max_quote_content']);
+    }, [agentInfo]);
+
+    async function getTotalNum(){
+        const res = await fetch("/api/agents/total_count", {
             method: "POST",
             body: JSON.stringify({name: "search_agent_v1"}),
             headers: {"Content-Type": "application/json"}
         });
         const resData = await res.json();
-        setAgents(resData['agents']);
+        setTotalNum(parseInt(resData['total_count']));
     }
 
     async function previousSample(){
@@ -71,8 +110,8 @@ export default function Home(){
 
     async function nextSample(){
         let _currentIndex = parseInt(currentIndex);
-        if (_currentIndex >= agents.length) {
-            _currentIndex = agents.length;
+        if (_currentIndex >= totalNum) {
+            _currentIndex = totalNum;
         }else{
             _currentIndex += 1;
         }
@@ -84,34 +123,29 @@ export default function Home(){
     async function jumpToSample(index: number){
         setCurrentIndex(index.toString());
         const indexNum = index - 1;
-        if (agents[indexNum] !== undefined){
-            const agentInfo = agents[indexNum];
-
-            setQuestion(agentInfo['info']['question']);
-            setAgentInfo(agentInfo);
-            setPosition("search");
-            setSearchResults([]);
-            setQuotes([]);
-            setActionIndex(0);
-            setActionDescription("");
-
-            const res = await fetch("/api/agents/get_config", {
-                method: "POST",
-                body: JSON.stringify({agent_id: agentInfo['agent_id']}),
-                headers: {"Content-Type": "application/json"}
-            });
-
-            const resData = await res.json();
-            setTotalActions(resData['total_actions']);
-            setActionsLeft(resData['config']['max_actions']);
-            setQuotesLeft(resData['config']['max_quote_content']);
+        if (indexNum < 0 || indexNum >= totalNum){
+            return;
         }
+
+        // if (agents[indexNum] !== undefined){
+        //     const agentInfo = agents[indexNum];
+        const res = await fetch("/api/agents/get_config", {
+            method: "POST",
+            body: JSON.stringify({name: "search_agent_v1", index: indexNum}),
+            headers: {"Content-Type": "application/json"}
+        });
+
+        const resData = await res.json();
+        setAgentInfo(resData);
+
+        // }
     }
 
     async function jumpToAction(index: number){
         if (index == 0){
             jumpToSample(parseInt(currentIndex));
         }
+        console.log("jump to action", agentInfo['agent_id'], index);
         if (index > 0 && index <= totalActions){
 
             const res = await fetch("/api/agents/jump_to_action", {
@@ -201,7 +235,7 @@ export default function Home(){
             </Grid>
             <Grid xs={12} md={6}>
                 <Box sx={{height: "50px", float: "right"}}>
-                    <TextField sx={{marginTop: "-17px", marginRight: "10px"}} label={"跳转至...("+agents.length+")"} variant="standard" value={currentIndex}
+                    <TextField sx={{marginTop: "-17px", marginRight: "10px"}} label={"跳转至...("+totalNum+")"} variant="standard" value={currentIndex}
                                onChange={(e)=>{
                                    setCurrentIndex(e.target.value);
                                }}

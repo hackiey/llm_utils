@@ -9,7 +9,10 @@ def get_messages_uid(messages):
         hash_str = message['role']
 
         if 'content' in message and message['content'] is not None and message['content'] != "":
-            hash_str += "/" + message['content'] if message['content'] is not None else ""
+            if type(message['content']) == list:
+                hash_str += "/" + ','.join([json.dumps(content, ensure_ascii=False) for content in message['content']])
+            else:
+                hash_str += "/" + message['content'] if message['content'] is not None else ""
 
         if 'name' in message and message['name'] is not None and message['name'] != "":
             hash_str += "/" + message['name']

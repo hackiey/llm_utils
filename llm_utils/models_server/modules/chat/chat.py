@@ -1,3 +1,4 @@
+import os
 import json
 import secrets
 from openai import OpenAI
@@ -26,6 +27,8 @@ from llm_utils.models_server.modules.chat.protocol import (
 from llm_utils.models_server.utils import create_error_response
 from llm_utils.models_server.modules.chat.utils import save_chat
 
+MUST_HAS_USER_ID = os.getenv("MUST_HAS_USER_ID", "False").lower() in ("True", "1")
+
 chat_router = APIRouter(prefix="/chat")
 
 
@@ -34,9 +37,12 @@ async def create_chat_completion(request: ChatCompletionRequest):
     print("==================================================================================================")
     print(datetime.now().strftime("%H:%M:%S"), f"stream: {request.stream}", request.messages[-1].content)
     print(request.model_dump_json(indent=4))
-
+    
     if request.model.startswith("gpt"):
-        return gpt_response(request)
+        if request.model in ("gpt-3.5-turbo", "gpt-4-turbo"):
+            return gpt_response(request)
+        else:
+            return create_error_response(400, f"model {request.model} is not supported")
 
     if request.model in ["qwen-14b-chat", "qwen-72b-chat", "qwen-turbo", "qwen-plus", "qwen-max", "qwen-max-1201", "qwen-max-longcontext"]:
         return qwen_response(request)
@@ -305,19 +311,32 @@ def gpt_response(request: ChatCompletionRequest):
 
     # if functions is not None and len(functions) > 0:
     #     params.update({"functions": functions, "function_call": request.function_call})
+        
 
-    if request.stream:
-        response = gpt_response_generator(params, request)
-        return StreamingResponse(response, media_type="text/event-stream")
+    can_request = False
+    if MUST_HAS_USER_ID:
+        first_user_message = [message for message in messages if message['role'] == "user"][0]
+        if 'id' in first_user_message and first_user_message['id'] is not None:
+            can_request = True
+        print(f"------------------{can_request},{first_user_message['id']}")
     else:
-        client = OpenAI()
-        resp = client.chat.completions.create(**params)
+        can_request = True
 
-        # messages_with_response = params['messages'] + [json.loads(resp.choices[0].message.model_dump_json())]
-        # save_chat(messages_with_response, request.model)
+    if can_request:
+        if request.stream:
+            response = gpt_response_generator(params, request)
+            return StreamingResponse(response, media_type="text/event-stream")
+        else:
+            client = OpenAI()
+            resp = client.chat.completions.create(**params)
 
-        print(datetime.now().strftime("%H:%M:%S"), "done")
-        return resp
+            # messages_with_response = params['messages'] + [json.loads(resp.choices[0].message.model_dump_json())]
+            # save_chat(messages_with_response, request.model)
+
+            print(datetime.now().strftime("%H:%M:%S"), "done")
+            return resp
+
+    return
 
 
 # ==================================================================================================
