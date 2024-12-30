@@ -2,11 +2,11 @@ import {FilterOperators} from "@/app/types";
 import {extractFilters} from "@/app/utils/utils";
 
 let filters: any[] = [
-    {type: "tasks", operator: FilterOperators.Equal, arrayValue:["全部"], textValue: ""},
-    {type: "tags", operator: FilterOperators.Equal, arrayValue: ["全部"], textValue: ""},
-    {type: "difficulty", operator: FilterOperators.Equal, arrayValue: ["全部"], textValue: ""},
+    // {type: "tasks", operator: FilterOperators.Equal, arrayValue:["全部"], textValue: ""},
+    // {type: "tags", operator: FilterOperators.Equal, arrayValue: ["全部"], textValue: ""},
+    // {type: "difficulty", operator: FilterOperators.Equal, arrayValue: ["全部"], textValue: ""},
     {type: "verified", operator: FilterOperators.Equal, arrayValue: ["全部"], textValue: ""},
-    {type: "evaluation_task_name", operator: FilterOperators.Equal, arrayValue: [], textValue: ""},
+    // {type: "evaluation_task_name", operator: FilterOperators.Equal, arrayValue: [], textValue: ""},
 ]
 
 let page: number = 1;
@@ -28,7 +28,7 @@ export let evaluationStore = {
 
 export async function fetchEvaluationSamples(page: Number, filters: any){
     filters = extractFilters(filters);
-    console.log("[Evaluation Filters]", filters);
+    console.log("[Evaluation_old Filters]", filters);
 
     const response = await fetch("/api/evaluation/list", {
         method: "POST",

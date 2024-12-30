@@ -26,9 +26,10 @@ function App() {
         >
             <Grid xs={3} sx={{textAlign: "center"}}>
                     <Link href={"https://chat-next.iem-bj.xmxdev.com/#/chat"} target={"_blank"}>Chat</Link>
-                    <Link sx={{marginLeft: "50px"}} href={"/playground"}>Playground</Link>
-                    <Link sx={{marginLeft: "50px"}} href={"/lab"}>Lab</Link>
-                    <Link sx={{marginLeft: "50px"}} href={"/samples"}>Samples</Link>
+                    <Link sx={{marginLeft: "50px"}} href={"/demo"}>AI Demo</Link>
+                    {/*<Link sx={{marginLeft: "50px"}} href={"/playground"}>Playground</Link>*/}
+                    {/*<Link sx={{marginLeft: "50px"}} href={"/lab"}>Lab</Link>*/}
+                    {/*<Link sx={{marginLeft: "50px"}} href={"/samples"}>Samples</Link>*/}
                     <Link sx={{marginLeft: "50px"}} href={"/evaluation"}>Evaluation</Link>
             </Grid>
         </Grid>

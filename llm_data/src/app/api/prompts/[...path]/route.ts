@@ -47,7 +47,8 @@ async function handler(req: NextRequest, { params }: { params: { path: string[] 
         reqParams.messages.forEach((message: any) => {
             messages.push({
                 role: message.role,
-                content: message.content
+                content: message.content,
+                tools: message.tools
             });
         });
 
@@ -87,22 +88,27 @@ async function handler(req: NextRequest, { params }: { params: { path: string[] 
         reqParams.messages.forEach((message: any) => {
             messages.push({
                 role: message.role,
-                content: message.content
+                content: message.content,
+                tools: message.tools || null,
             });
         });
 
-        const updateBody = {
-            hash_id: getMessagesHashId(messages),
-            messages: messages,
-            tasks: reqParams.tasks,
-            tags: reqParams.tags,
-            difficulty: reqParams.difficulty,
-            title: reqParams.title,
-            update_time: reqParams.update_time,
-            update_user: reqParams.update_user
-        }
+        const newPrompt = await PromptModel.findOneAndUpdate(
+            {
+                _id: reqParams._id
+            }, {
+                hash_id: getMessagesHashId(messages),
+                messages: messages,
+                tasks: reqParams.tasks,
+                tags: reqParams.tags,
+                difficulty: reqParams.difficulty,
+                title: reqParams.title,
+                update_time: reqParams.update_time,
+                update_user: reqParams.update_user
+            }, {
+                new: true
+            });
 
-        const newPrompt = await PromptModel.findOneAndUpdate({_id: reqParams._id}, updateBody, {new: true});
         console.log(newPrompt);
 
         return NextResponse.json({status: 200, user: reqParams.update_user, message: "Prompt已更新"});

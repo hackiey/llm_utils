@@ -22,7 +22,7 @@ async function credentialsAuthorize(credentials: any){
         } as User;
     }
 
-    if (credentials.username + "!@#" == credentials.password){
+    if (credentials.username == credentials.password){
         return {
             id: credentials.username,
             name: credentials.username,

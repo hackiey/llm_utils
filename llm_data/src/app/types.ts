@@ -24,9 +24,18 @@ export enum ChatboxType {
     playground = "playground"
 }
 
+export interface ContentPart{
+    type: string,
+    text?: string,
+    image_url?: {
+        url: string,
+        detail?: string
+    }
+}
+
 export interface Message{
     role: string,
-    content: string,
+    content: string | ContentPart[],
     function_call?: {name: string, arguments: string},
     name?: string
 }
@@ -35,6 +44,7 @@ export interface Tool{
     type: string,
     function?: string
 }
+
 export interface ToolCall{
     id: string,
     function: {
@@ -47,7 +57,7 @@ export interface ToolCall{
 export interface SampleMessage extends Message{
     id: string,
     role: string,
-    content: string,
+    content: string | ContentPart[],
 
     name?: string,
     tools?: Tool[],

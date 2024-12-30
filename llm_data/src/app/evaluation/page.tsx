@@ -3,6 +3,7 @@
 import * as React from 'react';
 
 import { useSession, signIn, signOut } from 'next-auth/react'
+import { useSearchParams } from "next/navigation";
 
 import Grid from "@mui/material/Unstable_Grid2";
 import {Avatar, Box, IconButton, Link, ListItemIcon, Menu, MenuItem, Tab} from "@mui/material";
@@ -10,7 +11,7 @@ import {useState} from "react";
 
 import {TabContext, TabList, TabPanel} from "@mui/lab";
 import Evaluation from "@/app/evaluation/evaluation";
-import Distribution from "@/app/evaluation/distribution";
+import Distribution from "@/app/evaluation/results";
 
 import AvatarMenu from "@/app/components/avatar-menu";
 

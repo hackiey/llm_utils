@@ -1,13 +1,5 @@
 import {Schema, Types} from "mongoose";
-import {ChatLog, Message, SampleChatLog, SampleMessage, Tool, ToolCall} from "@/app/types";
-
-
-export const MessageSchema = new Schema<Message>({
-    role: String,
-    content: String,
-    function_call: {name: String, arguments: String},
-    name: String
-});
+import {ChatLog, ContentPart, Message, SampleChatLog, SampleMessage, Tool, ToolCall} from "@/app/types";
 
 export const MessageToolSchema = new Schema<Tool>({
     type: String,
@@ -25,11 +17,27 @@ export const ToolCallSchema = new Schema<ToolCall>({
     type: String
 });
 
+// export const MessageSchema = new Schema<Message>({
+//     role: String,
+//     content: String,
+//     tools: [MessageToolSchema],
+//     name: String
+// });
+
+export const MessageContentPart = new Schema<ContentPart>({
+    type: String,
+    text: String || null,
+    image_url: {
+        url: String,
+        detail: String || null
+    } || null
+})
+
 export const SampleMessageSchema = new Schema<SampleMessage>({
     id: String,
     
     role: String,
-    content: String,
+    content: String || [MessageContentPart],
     
     name: String,
     tools: [MessageToolSchema],
@@ -105,7 +113,7 @@ export const SampleHistorySchema = new Schema({
 
 export const PromptSchema = new Schema({
     hash_id: {type: String, unique: true},
-    messages: [MessageSchema],
+    messages: [SampleMessageSchema],
     tasks: [String],
     tags: [String],
     difficulty: String,
@@ -148,8 +156,8 @@ export const ToolSchema = new Schema({
 export const EvaluationSampleSchema = new Schema({
     task_name: String,
     messages: [SampleMessageSchema],
-    replies: [SampleMessageSchema],
-    reference: SampleMessageSchema,
+    replies: [String],
+    reference: String,
     reply_tags: [String],
     rank_tags: [Number],
     tasks: [String],

@@ -85,7 +85,7 @@ export default function MessageBox(props: {
     const [useTools, setUseTools] = useState(false);
     // const [useToolCalls, setUseToolCalls] = useState(false);
 
-    const [referenceModel, setReferenceModel] = useState("gpt-4-1106-preview");
+    const [referenceModel, setReferenceModel] = useState("gpt-4o");
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
 
@@ -407,7 +407,7 @@ export default function MessageBox(props: {
                                     </Button>
                                 )}
 
-                                {message.role == "assistant" && sampleChatboxTypes.includes(props.chatboxType) &&
+                                {(message.role == "assistant"  || message.role == "system") && sampleChatboxTypes.includes(props.chatboxType) &&
                                     <Box sx={{float: "right", marginTop: "-5px"}}>
                                         <Checkbox sx={{marginLeft: "-10px"}} checked={useTools}
                                                   onChange={(e: any)=>{
@@ -420,7 +420,7 @@ export default function MessageBox(props: {
                                 
                             {/* 编辑 Tools */}
                             <Box>
-                                {message.role == "assistant" && sampleChatboxTypes.includes(props.chatboxType) && useTools ? (
+                                {(message.role == "assistant" || message.role == "system") && sampleChatboxTypes.includes(props.chatboxType) && useTools ? (
                                     <Box sx={{marginTop: "10px"}}>
                                         <ToolsBox tools={editTools} updateTools={setEditTools} />
                                     </Box>) : <Box></Box>
@@ -428,7 +428,7 @@ export default function MessageBox(props: {
                             </Box>
 
                             {/* 编辑 Tool Calls */}
-                            {useTools && sampleChatboxTypes.includes(props.chatboxType) &&
+                            {message.role == "assistant" && useTools && sampleChatboxTypes.includes(props.chatboxType) &&
                                 <ToolCallsBox editToolCalls={editToolCalls} updateEditToolCalls={setEditToolCalls} />
                             }
 

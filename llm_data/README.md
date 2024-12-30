@@ -5,7 +5,7 @@ The Markdown style comes from [ChatGPT-Next-Web](https://github.com/ChatGPTNextW
 ## Features
 - [x] Samples: Display, management, and annotation of dialogue data.
 - [x] Playground: A simple playground for testing the model.
-- [x] Human Evaluation: Refer to OpenAI's InstructGPT annotation interface.
+- [x] Human Evaluation_old: Refer to OpenAI's InstructGPT annotation interface.
 - [] Preference Annotation
 - [] MultiModel Display/Annotation
 

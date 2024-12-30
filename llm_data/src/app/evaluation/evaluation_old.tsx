@@ -9,8 +9,6 @@ import AssistantIcon from "@mui/icons-material/Assistant";
 import * as React from "react";
 import { evaluationStore, fetchEvaluationSamples, fetchEvaluationSampleTotalCount, requestUpdateEvaluationSample } from "@/app/store/evaluation/evaluation";
 import {useSession} from "next-auth/react";
-import {useSearchParams} from "next/navigation";
-import {FilterOperators} from "@/app/types";
 
 const icons: { [index: string]: any } = {
     user: <PersonIcon />,
@@ -59,44 +57,29 @@ function getItemStyle(isDragging: boolean, draggableStyle: any){
     }
 }
 
-function ResponseCard(props: {message: any, dtype: string, provided: any, modelName: string}){
+function ResponseCard(props: {message: any, dtype: string, provided: any}){
     return (
         <Card sx={{m: 1, maxWidth: props.dtype == "replies" ? "18%" : "100%"}}
               ref={props.provided.innerRef} {...props.provided.draggableProps} {...props.provided.dragHandleProps}>
             <CardContent>
-                <Box sx={{
-                    // width: "30px",
-                    width: "fit-content",
-                    textAlign: "center",
-                    padding: "2px",
-                    margin: "-10px 0px 10px -10px",
-                    borderRadius: "5px",
-                    backgroundColor: "#1996d3"
-                }}>
-                    {props.modelName == "" ?
-                        <span style={{color: "white", padding: "0px 8px 0px 8px"}}>{props.message.index + 1}</span> :
-                        <span style={{color: "white", padding: "0px 8px 0px 8px"}}>{props.modelName}</span>
-                    }
+                <Box sx={{width: "30px", textAlign: "center", padding: "2px", margin: "-10px 0px 10px -10px", borderRadius: "5px", backgroundColor: "#1996d3"}}>
+                    <span style={{color: "white"}}>{props.message.index+1}</span>
                 </Box>
-                <Markdown content={props.message.content}/>
+                <Markdown content={props.message.content} />
             </CardContent>
         </Card>
     )
 }
 
-export default function Evaluation (){
+export default function Evaluation_old (){
 
     const { data: session, status } = useSession();
-
-    const searchParams = useSearchParams();
-    const taskName = searchParams.get("task");
 
     const orderRankIds = ["rank-1", "rank-2", "rank-3", "rank-4", "rank-5"];
 
     const [page, setPage] = useState(evaluationStore.getPage());
     const [pageValue, setPageValue] = useState(evaluationStore.getPage()+1);
     const [totalCount, setTotalCount] = useState(0);
-
     const [filters, setFilters] = useState(evaluationStore.getEvaluationFilters());
     const [evaluationSample, setEvaluationSample] = useState<{[index: string]: any}>({});
     const [messages, setMessages] = useState<any[]>([]);
@@ -105,12 +88,6 @@ export default function Evaluation (){
     const [submitButtonString, setSubmitButtonString] = useState("提交");
     const [submitDisabled, setSubmitDisabled] = useState(false);
     const [autoNext, setAutoNext] = useState(true);
-    const [displayModel, setDisplayModel] = useState(false);
-
-    // useEffect(() => {
-    //     const evaluationFilters = [{type: "evaluation_task_name", operator: FilterOperators.Equal, arrayValue: [], textValue: taskName}];
-    //     updateFilters(evaluationFilters);
-    // }, []);
 
     // replyIds: Array.from({length: Object.keys(_replies).length}, (_, i) => `reply-${i+1}`)},
     let _droppableData: {[key: string]: any} = {
@@ -132,7 +109,6 @@ export default function Evaluation (){
     function updatePageValue(newPageValue: number){
         setPageValue(newPageValue);
         setPage(newPageValue-1);
-        setDisplayModel(false);
         evaluationStore.updatePage(newPageValue-1);
     }
 
@@ -150,8 +126,7 @@ export default function Evaluation (){
     }
 
     async function refreshData(){
-        const res = await fetchEvaluationSamples(page, filters.concat(
-            [{type: "evaluation_task_name", operator: FilterOperators.Equal, arrayValue: [], textValue: taskName}]));
+        const res = await fetchEvaluationSamples(page, filters);
 
         setSubmitDisabled(false);
         setSubmitButtonString("提交");
@@ -179,9 +154,8 @@ export default function Evaluation (){
                 id: `reply-${i+1}`,
                 index: i,
                 model: _evaluationSample.reply_tags[i],
-                // role: _evaluationSample.replies[i].role,
-                role: "assistant",
-                content: _evaluationSample.replies[i]
+                role: _evaluationSample.replies[i].role,
+                content: _evaluationSample.replies[i].content
             };
         }
         setReplies(_replies);
@@ -201,9 +175,7 @@ export default function Evaluation (){
         setDroppableData(droppableData);
 
         // 更新总数
-        const _totalCount = await fetchEvaluationSampleTotalCount(filters.concat(
-            [{type: "evaluation_task_name", operator: FilterOperators.Equal, arrayValue: [], textValue: taskName}]));
-
+        const _totalCount = await fetchEvaluationSampleTotalCount(filters);
         if (pageValue > _totalCount.total_count){
             updatePageValue(_totalCount.total_count);
             // setPageValue(_totalCount.total_count);
@@ -293,14 +265,13 @@ export default function Evaluation (){
                 </Grid>
             </Grid>
             <Divider sx={{marginTop: "10px", marginBottom: "10px"}}/>
-            <Box>
-                {evaluationSample.tags && evaluationSample.tags.map((tag: string, index: number)=>(
-                        <Chip key={index} sx={{m: 1}} label={tag} variant="outlined" />
-                    ))}
-            </Box>
+            <Chip sx={{m: 1}} label={"任务: "+ evaluationSample.tasks} variant="outlined" />
+            <Chip sx={{m: 1}} label={"标签: "+ evaluationSample.tags} variant="outlined" />
+            <Chip sx={{m: 1}} label={"难度: "+ evaluationSample.difficulty} variant="outlined" />
 
             <List sx={{width: "100%", marginTop: -1}}>
-                {messages.map((message: any, index: number)=>(
+                {/*取到倒数第二条*/}
+                {messages.slice(0, messages.length-1).map((message: any, index: number)=>(
                     <ListItem key={index} sx={{
                         width: "100%", paddingTop: "1.5em", "paddingBottom": "1.5em", borderBottom: "1px slid #E1E1E2",
                         backgroundColor: backgroundColors[message.role]
@@ -318,11 +289,16 @@ export default function Evaluation (){
                     </ListItem>
                 ))}
             </List>
-
+            <Divider/>
+            <Box sx={{marginTop: "20px"}}>
+                <p style={{fontWeight: "bold", color: "#454556", marginBottom: "5px"}}>参考答案</p>
+                {/* <Markdown content={messages.length > 0 ? messages[messages.length-1].content : ""} /> */}
+                <Markdown content={evaluationSample.reference?.content} />
+            </Box>
             <Divider sx={{width: "50%", marginTop: "10px"}} />
             <Box sx={{height: "40px", marginTop: "20px"}}>
                 <span style={{fontWeight: "bold", color: "#454556", margin: "20px 5px 5px 0px"}}>
-                    根据下方用户问题和搜索结果，为以下回复排序
+                    根据以上聊天记录和参考答案，为以下回复排序
                 </span>
 
                 <Box sx={{float: "right", marginTop: "-10px"}}>
@@ -335,13 +311,6 @@ export default function Evaluation (){
                         {submitButtonString}
                     </Button>
                 </Box>
-
-                {evaluationSample.verified == "已验证" &&
-                    <Box sx={{float: "right", marginTop: "-10px"}}><Checkbox checked={displayModel} onChange={(e: any)=> {
-                            setDisplayModel(e.target.checked);
-                        }} />
-                            <span style={{color: "gray", fontSize: "0.8em", marginRight: "1em"}}>展示模型名称</span>
-                    </Box>}
             </Box>
 
             <DragDropContext onDragEnd={onDragEnd}>
@@ -354,8 +323,7 @@ export default function Evaluation (){
                             {droppableData["replies"].replyIds.map((replyId: string, index: number)=>(
                                 <Draggable key={replyId} draggableId={replyId} index={index}>
                                     {(provided, snapshot) => (
-                                        <ResponseCard message={replies[replyId]} dtype={"replies"} provided={provided}
-                                                      modelName={""}/>
+                                        <ResponseCard message={replies[replyId]} dtype={"replies"} provided={provided} />
                                     )}
                                 </Draggable>
 
@@ -382,12 +350,10 @@ export default function Evaluation (){
                                         {droppableData[rankId].replyIds.map((replyId: string, index: number) => {
                                             const reply = replies[replyId];
 
-                                            const modelName = displayModel&&evaluationSample.verified=="已验证"?reply.model:"";
                                             return (
                                                 <Draggable key={replyId} draggableId={replyId} index={index}>
                                                     {(provided, snapshot) => (
-                                                        <ResponseCard message={reply} dtype={"rank"} provided={provided}
-                                                                      modelName={modelName}/>
+                                                        <ResponseCard message={reply} dtype={"rank"} provided={provided}/>
                                                     )}
                                                 </Draggable>
                                             )
@@ -401,14 +367,6 @@ export default function Evaluation (){
                 </Grid>
 
             </DragDropContext>
-
-            <Divider/>
-            <Box sx={{marginTop: "20px"}}>
-                <p style={{fontWeight: "bold", color: "#454556", marginBottom: "5px", fontSize: "36px"}}>搜索结果</p>
-                <Divider/>
-                {/* <Markdown content={messages.length > 0 ? messages[messages.length-1].content : ""} /> */}
-                <Markdown content={evaluationSample.reference} />
-            </Box>
         </Box>
     )
 }

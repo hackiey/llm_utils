@@ -230,12 +230,12 @@ export default function ToolsBox(props: {tools: any[], updateTools: Function}){
 
         <Divider sx={{margin: "8px 0px 8px 0px"}} />
 
-        <Box sx={{marginTop: "10px"}}>
-            <span style={{color: "#454545"}}>Retrieval<span style={{color: "gray"}}>(Coming Soon)</span></span>
-            <Switch sx={{float: "right", margin: "-6px -4px 0px 0px"}} disabled={true} onClick={(e: any)=>{
-                updateSwitch("retrieval", e.target.checked);
-            }} />
-        </Box>
+        {/*<Box sx={{marginTop: "10px"}}>*/}
+        {/*    <span style={{color: "#454545"}}>Retrieval<span style={{color: "gray"}}>(Coming Soon)</span></span>*/}
+        {/*    <Switch sx={{float: "right", margin: "-6px -4px 0px 0px"}} disabled={true} onClick={(e: any)=>{*/}
+        {/*        updateSwitch("retrieval", e.target.checked);*/}
+        {/*    }} />*/}
+        {/*</Box>*/}
 
     </Box>
 }

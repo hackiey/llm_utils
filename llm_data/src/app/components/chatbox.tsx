@@ -126,7 +126,7 @@ export default function Chatbox(props: {
     // 输入
     const [inputRole, setInputRole] = useState("user");
     const [inputContent, setInputContent] = useState("");
-    const [inputModel, setInputModel] = useState(props.config.model || "gpt-4-1106-preview");
+    const [inputModel, setInputModel] = useState(props.config.model || "gpt-4o");
 
     const [useTools, setUseTools] = useState<boolean>(false);
     const [tools, setTools] = useState<any[]>([]);
@@ -158,7 +158,7 @@ export default function Chatbox(props: {
     async function updatePrompt(index: number, title: string){
 
         const promptMessages = props.sample.messages.slice(0, index + 1);
-
+        console.log(promptMessages);
         if (title == "" || promptMessages.length == 0 || promptMessages[0].content == ""){
             setLogMessage("[" + new Date().toLocaleTimeString() + "] [" + (session?.user?.name||"") + "] " + "Prompt标题和内容不能为空");
 
@@ -452,13 +452,13 @@ export default function Chatbox(props: {
 
                         </Grid>
 
-                        {sampleChatboxTypes.includes(props.chatboxType) && props.sample._id == undefined ? (
-                            <Alert sx={{width: "100%"}} severity="info">
-                                1. 选择user并添加，会自动触发assistant回复<br/>
-                                2. 只有包含assistant信息的对话会被保存<br/>
-                                3. source=labeling
-                            </Alert>
-                            ) : (<Box></Box>)}
+                        {/*{sampleChatboxTypes.includes(props.chatboxType) && props.sample._id == undefined ? (*/}
+                        {/*    <Alert sx={{width: "100%"}} severity="info">*/}
+                        {/*        1. 选择user并添加，会自动触发assistant回复<br/>*/}
+                        {/*        2. 只有包含assistant信息的对话会被保存<br/>*/}
+                        {/*        3. source=labeling*/}
+                        {/*    </Alert>*/}
+                        {/*    ) : (<Box></Box>)}*/}
                     </Grid>
                 </Box>
             }

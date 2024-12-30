@@ -10,6 +10,7 @@ from llm_utils.models_server.modules.embeddings.embeddings import embedding_rout
 from llm_utils.models_server.modules.tools.tools import tools_router
 from llm_utils.models_server.modules.images.images import images_router
 from llm_utils.models_server.modules.lab.lab import lab_router
+from llm_utils.models_server.modules.models.models import models_router
 
 port = int(os.getenv("PORT", 8000))
 
@@ -24,6 +25,7 @@ app.add_middleware(
 )
 
 prefix = "/v1"
+app.include_router(models_router, prefix=prefix, tags=["Models"])
 app.include_router(chat_router, prefix=prefix, tags=["Chat"])
 app.include_router(embedding_router, prefix=prefix, tags=["Embedding"])
 app.include_router(tools_router, prefix=prefix, tags=['Tools'])

@@ -4,7 +4,6 @@ import { Schema, Types, model } from 'mongoose';
 import mongoose from "mongoose";
 
 import {EvaluationSampleSchema} from "@/app/api/common/schemas";
-
 mongoose.connect(process.env.MONGODB_CONNECTION_STRING || "");
 
 const EvaluationSampleModel = mongoose.models.evaluation_samples || model("evaluation_samples", EvaluationSampleSchema);

@@ -39,12 +39,12 @@ async def create_chat_completion(request: ChatCompletionRequest):
     print(request.model_dump_json(indent=4))
     
     if request.model.startswith("gpt"):
-        if request.model in ("gpt-3.5-turbo", "gpt-4-turbo"):
+        if request.model in ("gpt-4o", "gpt-4o-mini"):
             return gpt_response(request)
         else:
             return create_error_response(400, f"model {request.model} is not supported")
 
-    if request.model in ["qwen-14b-chat", "qwen-72b-chat", "qwen-turbo", "qwen-plus", "qwen-max", "qwen-max-1201", "qwen-max-longcontext"]:
+    if request.model in ["qwen-plus", "qwen-max"]:
         return qwen_response(request)
 
     # other models

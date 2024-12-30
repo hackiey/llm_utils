@@ -12,6 +12,14 @@ def get_evaluation_collection():
     return db['evaluation_samples']
 
 
+def get_evaluation_tasks_collection():
+    MONGO_CLIENT = os.environ.get("MONGO_CLIENT", "")
+    client = MongoClient(MONGO_CLIENT)
+    db = client['llm_data']
+
+    return db['evaluation_tasks']
+
+
 def create_evaluation_sample(task_name, messages, referece, replies, reply_tags, tasks,  tags, source, language,
                              difficulty, meta, rank_tags=None, shuffle=True):
 
@@ -49,5 +57,20 @@ def create_evaluation_sample(task_name, messages, referece, replies, reply_tags,
         "update_time": int(time.time() * 1000),
     }
 
-def insert_evaluation_sample(sample, evaluation_samples_collection):
-    evaluation_samples_collection.insert_one(sample)
+
+def insert_evaluation_sample(sample):
+    MONGO_CLIENT = os.environ.get("MONGO_CLIENT", "")
+    client = MongoClient(MONGO_CLIENT)
+    db = client['llm_data']
+
+    evaluation_samples = db['evaluation_samples']
+    evaluation_samples.insert_one(sample)
+
+
+def insert_evaluation_task(task):
+    MONGO_CLIENT = os.environ.get("MONGO_CLIENT", "")
+    client = MongoClient(MONGO_CLIENT)
+    db = client['llm_data']
+
+    evaluation_tasks = db['evaluation_tasks']
+    evaluation_tasks.insert_one(task)

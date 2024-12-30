@@ -6,21 +6,24 @@ import {useEffect, useState} from "react";
 import {distribution, fetchDistributionSamples, fetchEvaluationTasks} from "@/app/store/evaluation/distribution";
 import {Markdown} from "@/app/components/markdown";
 import {ColumnItems} from "@/app/constant";
+import {useSearchParams} from "next/navigation";
+import {evaluationStore} from "@/app/store/evaluation/evaluation";
+import {FilterOperators} from "@/app/types";
 
-function PieDistribution(props: {distribution: {[index:string]: number}, category: string}){
+function PieDistribution(props: {distribution: {[index:string]: number}}){
 
     let xLabels: any[] = [];
     let data: any[] = [];
-    ColumnItems[props.category].items.map((label: string, index: number)=>{
-        xLabels.push(label);
-        data.push(props.distribution[label] ? props.distribution[label] : 0);
+    Object.keys(props.distribution).forEach(key=>{
+        xLabels.push(key);
+        data.push(props.distribution[key]);
     });
 
     return (
          <Box sx={{marginTop: "20px"}}>
             <BarChart series={[{data: data, label: "Num"}]}
                       xAxis={[{ data: xLabels, scaleType: 'band' }]}
-                      width={ColumnItems[props.category].items.length * 70}
+                      width={Object.keys(props.distribution).length * 70}
                       height={300}
                       colors={['#1976d2']}
             />
@@ -68,29 +71,23 @@ function EvaluationResult(props: {evaluationResult: any}){
 
                             return (<td key={index2} style={{minWidth: "200px"}}>
                                 <Box sx={{borderRight: "1px solid lightblue", width: "33%", float: "left"}}>
-                                    <span
-                                        style={{color: "#55bb55"}}>{winNum}</span>
+                                    <span style={{color: "#55bb55"}}>{winNum}</span>
                                 </Box>
                                 <Box sx={{borderRight: "1px solid lightblue", width: "33%", float: "left"}}>
-                                    <span
-                                        style={{color: "#bb5555"}}>{loseNum}</span>
+                                    <span style={{color: "#bb5555"}}>{loseNum}</span>
                                 </Box>
 
-                                <span
-                                    style={{color: "#5555bb"}}>{drawNum}</span>
+                                <span style={{color: "#5555bb"}}>{drawNum}</span>
 
                                 <Divider/>
                                 <Box sx={{borderRight: "1px solid lightblue", width: "33%", float: "left"}}>
-                                    <span
-                                        style={{color: "#55bb55"}}>{winRate}</span>
+                                    <span style={{color: "#55bb55"}}>{winRate}</span>
                                 </Box>
                                 <Box sx={{borderRight: "1px solid lightblue", width: "33%", float: "left"}}>
-                                    <span
-                                        style={{color: "#55bb55"}}>{loseRate}</span>
+                                    <span style={{color: "##bb5555"}}>{loseRate}</span>
                                 </Box>
 
-                                <span
-                                    style={{color: "#bb5555"}}>{drawRate}</span>
+                                <span style={{color: "#5555bb"}}>{drawRate}</span>
                             </td>)
                         })}
                     </tr>
@@ -99,77 +96,47 @@ function EvaluationResult(props: {evaluationResult: any}){
             </table>
 
             <Box sx={{marginTop: "30px"}}></Box>
-            <Markdown content={"## Average rank"} />
+            <Markdown content={"## Average rank \n\n 分数越低代表排名越靠前"} />
 
-            <PieDistribution distribution={props.evaluationResult.taskNum} category={"tasks"} />
+            {/*<PieDistribution distribution={props.evaluationResult.tagNum}/>*/}
             <table className={"distribution-column"} style={{marginTop: "20px"}}>
-                <thead>
-                    <tr>
-                        <th></th>
-                        {ColumnItems.tasks.items.map((task: string, index: number)=>(
-                            <th key={index}>{task}</th>
-                        ))}</tr>
-                </thead>
+                <thead><tr><th></th><th>平均排名</th></tr></thead>
                 <tbody>
-
-                    {props.evaluationResult.models.map((model: string, index: number)=>(
+                    {props.evaluationResult.modelScore.map((modelScore: any, index: number) => (
                         <tr key={index}>
-                            <th>{model}</th>
-                            {ColumnItems.tasks.items.map((task: string, index: number)=>(
-                                <td key={index}>
-                                    {props.evaluationResult.taskScore[model][task] == undefined ? 0 : props.evaluationResult.taskScore[model][task].toFixed(2)}
-                                </td>))}
+                            <th>{modelScore["model"]}</th>
+                            <td>{modelScore["score"].toFixed(2)}</td>
                         </tr>
                     ))}
-
                 </tbody>
             </table>
-
-            <PieDistribution distribution={props.evaluationResult.tagNum} category={"tags"} />
             <table className={"distribution-column"} style={{marginTop: "20px"}}>
                 <thead>
                     <tr>
                         <th></th>
-                        {ColumnItems.tags.items.map((task: string, index: number)=>(
-                            <th key={index}>{task}</th>
-                        ))}</tr>
+                        {Object.keys(props.evaluationResult.tagNum).map((tag: string, index:number)=>(
+                            <th key={index}>{tag}</th>
+                        ))}
+                    </tr>
                 </thead>
                 <tbody>
-
-                    {props.evaluationResult.models.map((model: string, index: number)=>(
+                    <tr>
+                        <td>总数</td>
+                        {Object.keys(props.evaluationResult.tagNum).map((tag: string, index: number) => (
+                            <td key={index}>
+                                {props.evaluationResult.tagNum[tag] == undefined ? 0 : props.evaluationResult.tagNum[tag]}
+                            </td>
+                        ))}
+                    </tr>
+                    {props.evaluationResult.models.map((model: string, index: number) => (
                         <tr key={index}>
                             <th>{model}</th>
-                            {ColumnItems.tags.items.map((tag: string, index: number)=>(
+                            {Object.keys(props.evaluationResult.tagScore[model]).map((tag: string, index: number) => (
                                 <td key={index}>
                                     {props.evaluationResult.tagScore[model][tag] == undefined ? 0 : props.evaluationResult.tagScore[model][tag].toFixed(2)}
                                 </td>))}
                         </tr>
                     ))}
-
-                </tbody>
-            </table>
-
-            <PieDistribution distribution={props.evaluationResult.difficultyNum} category={"difficulty"} />
-            <table className={"distribution-column"} style={{marginTop: "20px"}}>
-                <thead>
-                    <tr>
-                        <th></th>
-                        {ColumnItems.difficulty.items.map((difficulty: string, index: number)=>(
-                            <th key={index}>{difficulty}</th>
-                        ))}</tr>
-                </thead>
-                <tbody>
-
-                    {props.evaluationResult.models.map((model: string, index: number)=>(
-                        <tr key={index}>
-                            <th>{model}</th>
-                            {ColumnItems.difficulty.items.map((difficulty: string, index: number)=>(
-                                <td key={index}>
-                                    {props.evaluationResult.difficultyScore[model][difficulty] == undefined ? 0 : props.evaluationResult.difficultyScore[model][difficulty].toFixed(2)}
-                                </td>))}
-                        </tr>
-                    ))}
-
                 </tbody>
             </table>
         </Box>
@@ -177,7 +144,10 @@ function EvaluationResult(props: {evaluationResult: any}){
 }
 
 export default function Distribution() {
-    const [evaluationResult, setEvaluationResult] = useState<{[index: string]: any}>({});
+    const [evaluationResult, setEvaluationResult] = useState<{ [index: string]: any }>({});
+
+    const searchParams = useSearchParams();
+    const taskName = searchParams.get("task");
 
     const [filters, setFilters] = useState(distribution.getDistributionFilters());
     const availableFilterTypes: string[] = [];
@@ -188,7 +158,7 @@ export default function Distribution() {
     }
 
     async function updateEvaluationResult(){
-        const modelResult = await fetchDistributionSamples(filters);
+        const modelResult = await fetchDistributionSamples(filters.concat([{type: "evaluation_task_name", operator: FilterOperators.Equal, arrayValue: [], textValue: taskName}]));
         setEvaluationResult(modelResult);
     }
 

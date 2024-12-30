@@ -3,9 +3,8 @@ import {extractFilters} from "@/app/utils/utils";
 import {FilterOperators} from "@/app/types";
 
 let filters: any[] = [
-    {type: "tasks", operator: FilterOperators.Equal, arrayValue: ["全部"], textValue: ""},
-    {type: "tags", operator: FilterOperators.Equal, arrayValue: ["全部"], textValue: ""},
-    {type: "difficulty", operator: FilterOperators.Equal, arrayValue: ["全部"], textValue: ""}
+    {type: "verified", operator: FilterOperators.Equal, arrayValue: ["已验证"], textValue: ""},
+    // {type: "tags", operator: FilterOperators.Equal, arrayValue: ["全部"], textValue: ""},
 ];
 
 let currentTask: any = undefined;
@@ -37,7 +36,7 @@ export async function fetchEvaluationTasks(){
 export async function fetchDistributionSamples(filters: any){
     filters = extractFilters(filters);
 
-    console.log("[Distribution Filters]", filters);
+    console.log("[Distribution_old Filters]", filters);
 
     const response = await fetch("/api/evaluation/list", {
         method: "POST",
@@ -66,10 +65,12 @@ function calculateEvaluationResult(evaluationSamples: any[]){
         taskNum: {},
         tagNum: {},
         difficultyNum: {},
+        modelScore: []
     };
 
     const firstSample = evaluationSamples[0];
     let models = firstSample.reply_tags;
+    let modelTotalScore: {[index: string]: number} = {};
 
     modelResult.models = models;
 
@@ -80,10 +81,12 @@ function calculateEvaluationResult(evaluationSamples: any[]){
         modelResult.taskScore[model] = {};
         modelResult.tagScore[model] = {};
         modelResult.difficultyScore[model] = {};
+        modelTotalScore[model] = 0;
     });
 
     evaluationSamples.map((evaluationSample) => {
         let rank_tags: number[] = evaluationSample.rank_tags;
+
         let reply_tags: string[] = evaluationSample.reply_tags;
 
         evaluationSample.tasks.map((task: string) => {
@@ -102,6 +105,10 @@ function calculateEvaluationResult(evaluationSamples: any[]){
             modelResult.difficultyNum[evaluationSample.difficulty] = 0;
         }
         modelResult.difficultyNum[evaluationSample.difficulty] += 1;
+
+        evaluationSample.reply_tags.map((model: string, index: number) => {
+            modelTotalScore[model] += rank_tags[index];
+        });
 
         reply_tags.map((reply_tag1: string, index1: number) => {
             let rank1: number = rank_tags[index1];
@@ -141,6 +148,16 @@ function calculateEvaluationResult(evaluationSamples: any[]){
 
     });
 
+
+    models.map((model: string, index: number) => {
+        modelTotalScore[model] = modelTotalScore[model] / evaluationSamples.length;
+    });
+    // 按顺序排序
+    const sortedModels = Object.keys(modelTotalScore).sort((a, b) => modelTotalScore[a] - modelTotalScore[b]);
+    sortedModels.map((model: string, index: number) => {
+        modelResult.modelScore.push({model: model, score: modelTotalScore[model]});
+    });
+
     Object.keys(modelResult.taskScore).map((model: string, index: number)=>{
         Object.keys(modelResult.taskScore[model]).map((task: string, index: number) => {
             modelResult.taskScore[model][task] = modelResult.taskScore[model][task] / modelResult.taskNum[task];
@@ -156,6 +173,6 @@ function calculateEvaluationResult(evaluationSamples: any[]){
             modelResult.difficultyScore[model][difficulty] = modelResult.difficultyScore[model][difficulty] / modelResult.difficultyNum[difficulty];
         });
     });
-
+    console.log(modelResult);
     return modelResult;
 }
